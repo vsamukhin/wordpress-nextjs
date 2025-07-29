@@ -1,0 +1,15 @@
+# Игнорировать всё wp-content кроме наших тем и плагинов
+# wp-content/*
+# !wp-content/themes/
+# !wp-content/plugins/
+
+# Но внутри themes и plugins игнорировать чужие
+# wp-content/themes/*
+# !wp-content/themes/твоя_тема
+
+# wp-content/plugins/*
+# !wp-content/plugins/faustwp
+# !wp-content/plugins/wp-graphql
+
+# Медиафайлы не храним в Git
+wp-content/uploads
