@@ -1,0 +1,74 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  wordpress:
+    image: wordpress:latest
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8080:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+
+  wpcli:
+    image: wordpress:cli
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - wordpress
+      - db
+    working_dir: /var/www/html
+    entrypoint: sh -c "
+      wp core install \
+        --url='http://localhost:8080' \
+        --title='My Site' \
+        --admin_user=admin \
+        --admin_password=admin \
+        --admin_email=admin@example.com \
+        --skip-email || true && \
+      wp plugin install wp-graphql --activate && \
+      wp rewrite flush --hard"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: faust-nextjs
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_WORDPRESS_URL: http://wordpress
+      FAUSTWP_SECRET_KEY: my-secret-key
+    depends_on:
+      - wordpress
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+
+volumes:
+  db_data:

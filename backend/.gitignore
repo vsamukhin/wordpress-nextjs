@@ -1,0 +1,25 @@
+# Ignore core WordPress files if вы их не правите напрямую
+/wp-admin/
+/wp-includes/
+
+# Ignore uploads (медиа файлы)
+# wp-content/uploads/
+
+# Ignore cache and logs
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backups/
+*.log
+
+# Ignore environment and sensitive files
+wp-config.php
+.env
+
+# Ignore OS и IDE файлы
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Ignore node_modules если есть фронтенд в одной папке
+node_modules/
